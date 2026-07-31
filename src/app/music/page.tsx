@@ -1,5 +1,5 @@
-import MusicForm from "@/components/music/musicForm";
+import { MusicUploadForm } from "@/components/music/MusicUploadForm";
 
-export default function uploadPage() {
-  return <MusicForm />;
+export default function UploadPage() {
+  return <MusicUploadForm />;
 }

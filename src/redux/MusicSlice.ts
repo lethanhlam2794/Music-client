@@ -1,8 +1,5 @@
-// src/redux/MusicSlice.ts
-"use client"; // Thêm dòng này để biến thành Client Component
-
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { uploadMusic } from '../api/music/music.api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { uploadMusic } from "@/features/music/music-api";
 
 interface MusicState {
   loading: boolean;
@@ -17,19 +14,19 @@ const initialState: MusicState = {
 };
 
 export const uploadMusicThunk = createAsyncThunk(
-  'music/upload',
+  "music/upload",
   async (formData: FormData, { rejectWithValue }) => {
     try {
       const response = await uploadMusic(formData);
       return response;
-    } catch (error) {
-      return rejectWithValue('Upload failed');
+    } catch {
+      return rejectWithValue("Upload failed");
     }
   }
 );
 
 const musicSlice = createSlice({
-  name: 'music',
+  name: "music",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

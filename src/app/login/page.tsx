@@ -1,6 +1,6 @@
 import Login from "@/components/login/loginform";
 
 
-export default function RegisterPage() {
+export default function LoginPage() {
   return <Login />;
 }

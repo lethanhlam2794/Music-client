@@ -1,10 +1,14 @@
+import Image from "next/image";
+
 export function GocChuaLanh(){
     return(
         <div className="w-full h-[40vh] mb-6 rounded-lg overflow-hidden">
-        <img
-          src="/GocChuaLanh.png" // Đường dẫn đúng từ thư mục public
+        <Image
+          src="/GocChuaLanh.png"
           alt="Chủ đề và thể loại"
-          className="w-full h-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
       </div>
     )

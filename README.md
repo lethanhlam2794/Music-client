@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Music Client
 
-## Getting Started
+A Next.js music client (trang chủ, thể loại, đăng nhập/đăng ký, upload, thích, phát nhạc)
+được refactor để dùng design-system nội bộ dựa trên **shadcn/ui + Tailwind CSS v4**.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) · **React 19** · **TypeScript**
+- **Tailwind CSS v4** + **shadcn/ui** (base-nova) — design tokens qua biến CSS
+- **Redux Toolkit** — auth/music state
+- **axios** — HTTP client tập trung (`src/lib/api/http-client.ts`)
+- **react-hook-form** + **zod** — form & validation
+- **@tanstack/react-table** — bảng nâng cao
+- **Vitest** + **React Testing Library** + **jsdom** — unit/component tests
+
+## Yêu cầu
+
+- Node >= 22
+- Yarn
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn dev          # dev server
+yarn build        # production build
+yarn start        # chạy build
+yarn lint         # eslint (yêu cầu 0 warning: yarn lint --max-warnings=0)
+yarn test         # chạy unit/component tests (vitest run)
+yarn test:unit    # alias của yarn test
+yarn test:watch   # vitest watch mode
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Cấu hình môi trường
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy file mẫu và cập nhật giá trị:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env.local
+```
 
-## Learn More
+| Biến | Mặc định | Mục đích |
+|------|----------|----------|
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:3002` | Base URL của backend API |
 
-To learn more about Next.js, take a look at the following resources:
+API base URL được đọc tập trung qua `src/lib/config/env.ts` (`apiBaseUrl`) —
+không hardcode URL trong component/route.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Cấu trúc thư mục
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                 # Route App Router (page.tsx mỏng, delegate vào feature client)
+│   ├── page.tsx         # Trang chủ → HomePageClient
+│   ├── tag/             # Thể loại + [genre] → GenreIndex/DetailPageClient
+│   ├── login/ register/ music/   # Auth + upload
+├── components/
+│   ├── ui/              # shadcn/ui (button, input, card, dialog, table, ...)
+│   ├── shared/          # FormField primitive dùng chung
+│   ├── layout/          # Header, Sidebar, Footer, PageContainer
+│   ├── music/           # MusicCard, MusicGrid, MusicHero, GenreTileGrid, MusicPlayer, ...
+│   ├── navigation/      # AppNavigation, UserMenu (thay NavHome/NavHomeTop cũ)
+│   ├── login/ register/ # Form auth
+├── features/
+│   ├── auth/            # auth-api, auth-types, auth-validation, use-auth-session
+│   ├── music/           # music-api, music-types, use-music-list, use-like-toggle, upload/
+│   ├── player/          # use-audio-player, format-time, player-types
+│   ├── genres/          # GENRES, GenreIndex/DetailPageClient
+│   ├── home/            # HomePageClient
+├── lib/
+│   ├── config/          # env.ts (apiBaseUrl)
+│   ├── auth/            # token-storage (SSR-safe)
+│   ├── api/             # http-client (axios + interceptor)
+│   └── utils.ts         # cn() helper
+├── redux/               # LoginSlice, RegisterSlice, MusicSlice
+└── api/music/music.api.ts  # re-export tương thích cho API nhạc
+```
 
-## Deploy on Vercel
+## Design-system shadcn
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Component sinh ra bởi shadcn được đặt tại `src/components/ui`.
+- Token (màu, radius, border) định nghĩa trong `src/app/globals.css` qua biến CSS shadcn.
+- Styling dùng Tailwind utility + token (`bg-primary`, `text-muted-foreground`, ...).
+- Thư mục `design-system/` gốc (CSS Modules cũ) được giữ lại làm **tham khảo lịch sử**,
+  không còn được import bởi runtime app.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Testing
+
+- Test chạy với **Vitest** + **jsdom**; file nằm trong `tests/unit/*`.
+- `tests/setup.tsx` mock `next/navigation`, `next/image`, và reset mocks giữa các test.
+- Thư mục `tests/` được loại trừ khỏi type-check của `next build`.
+- E2E Playwright chưa được thêm (route smoke được phủ bằng unit/component + manual QA).
+
+## Lưu ý refactor
+
+- `/streammusic` route cũ là placeholder chết và đã được xóa; player chạy inline
+  qua `NowPlayingBar` + `MusicPlayer` (hook `useAudioPlayer`).
+- `react-bootstrap` và `react-icons` đã gỡ bỏ (không còn import).

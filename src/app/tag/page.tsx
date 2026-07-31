@@ -1,6 +1,5 @@
-// src/app/tag/genres/page.tsx
-import { ThemeAndGenre } from "@/components/ThemeAndGenre/TAG";
+import { GenreTileGrid } from "@/components/music/GenreTileGrid";
 
 export default function ThemeAndGenrePage() {
-  return <ThemeAndGenre />;
+  return <GenreTileGrid />;
 }

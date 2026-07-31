@@ -1,6 +1,7 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Providers } from "./providers";
+import { AppNavigation } from "@/components/navigation";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -25,13 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-
-        {children}
+        <Providers>
+          <AppNavigation />
+          <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
+        </Providers>
       </body>
     </html>
   );

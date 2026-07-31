@@ -1,13 +1,9 @@
-// src/redux/RegisterSlice.ts
-'use client'
-
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { register, type RegisterPayload } from "@/features/auth/auth-api";
 
 interface User {
   fullName: string;
   email: string;
-  password: string;
 }
 
 interface ErrorResponse {
@@ -21,23 +17,21 @@ interface RegisterState {
   error: ErrorResponse | string | null;
 }
 
-// Async thunk để gọi API đăng ký
-export const registerUser = createAsyncThunk<User, User, { rejectValue: ErrorResponse }>(
-  'auth/registerUser',
-  async (userData: User, { rejectWithValue }) => {
-    try {
-      const response = await axios.post('http://localhost:3002/auth/register', userData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      const errorResponse = error.response.data as ErrorResponse;
-      return rejectWithValue(errorResponse);
+export const registerUser = createAsyncThunk<
+  User,
+  RegisterPayload,
+  { rejectValue: ErrorResponse }
+>("auth/registerUser", async (userData, { rejectWithValue }) => {
+  try {
+    const response = await register(userData);
+    return response;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return rejectWithValue({ message: error.message });
     }
+    return rejectWithValue({ message: "Registration failed" });
   }
-);
+});
 
 const initialState: RegisterState = {
   user: null,
@@ -46,7 +40,7 @@ const initialState: RegisterState = {
 };
 
 const registerSlice = createSlice({
-  name: 'register',
+  name: "register",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -57,11 +51,14 @@ const registerSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
+        state.user = {
+          fullName: (action.payload as { fullName?: string }).fullName ?? "",
+          email: (action.payload as { email?: string }).email ?? "",
+        };
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload !== undefined ? action.payload : 'Registration failed.';
+        state.error = action.payload?.message ?? "Registration failed.";
       });
   },
 });

@@ -1,142 +1,103 @@
-"use client";  // Đảm bảo đây là dòng đầu tiên
+"use client";
 
-import { registerUser } from '@/redux/RegisterSlice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { useRouter } from 'next/navigation'; // Đổi sang 'next/navigation' thay vì 'next/router'
-import { useState } from 'react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { registerUser } from "@/redux/RegisterSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { registerSchema, type RegisterFormValues } from "@/features/auth/auth-validation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/shared/FormField";
+import { AuthTemplate } from "@/templates/AuthTemplate";
+import Link from "next/link";
 
-export default function Register() {
+export default function RegisterForm() {
   const dispatch = useAppDispatch();
   const { isLoading, error, user } = useAppSelector((state) => state.register);
+  const router = useRouter();
 
-  const router = useRouter(); // Sử dụng router để điều hướng
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const [passwordError, setPasswordError] = useState('');
-
- const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-
-    // Validate password length when input changes
-    if (e.target.name === 'password') {
-      if (e.target.value.length < 8) {
-        setPasswordError('Password must be at least 8 characters long');
-      } else {
-        setPasswordError('');   
-
-      }
-    }
+  const onSubmit = (data: RegisterFormValues) => {
+    dispatch(registerUser(data));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    // Check password length before submitting
-    if (formData.password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      return; 
-    }
-    dispatch(registerUser(formData));
-  };
-
-  const handleRetry = () => {
-    // Khi nhấn nút "Thử lại", không làm gì, giữ nguyên form
-  };
-
-  const handleNavigateToLogin = () => {
-    router.push('/login'); // Điều hướng sang trang đăng nhập
-  };
+  if (user) {
+    return (
+      <AuthTemplate
+        title="Đăng ký thành công!"
+        footer={
+          <span>
+            <Link href="/login" className="text-primary hover:underline">
+              Chuyển sang đăng nhập
+            </Link>
+          </span>
+        }
+      >
+        <p className="text-center text-muted-foreground">
+          Tài khoản của bạn đã được tạo. Vui lòng đăng nhập để tiếp tục.
+        </p>
+        <Button className="w-full" onClick={() => router.push("/login")}>
+          Đăng nhập
+        </Button>
+      </AuthTemplate>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        
-        {/* Nếu đăng ký thành công */}
-        {user && (
-          <div className="mb-6">
-            <p className="text-green-500 text-center">Đăng ký thành công!</p>
-            <button
-              type="button"
-              onClick={handleNavigateToLogin}
-              className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-            >
-              Chuyển sang đăng nhập
-            </button>
-          </div>
+    <AuthTemplate
+      title="Đăng ký"
+      subtitle="Tạo tài khoản mới để bắt đầu"
+      footer={
+        <span>
+          Đã có tài khoản?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Đăng nhập
+          </Link>
+        </span>
+      }
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          name="fullName"
+          label="Họ và tên"
+          required
+          error={errors.fullName}
+        >
+          <Input type="text" placeholder="Nhập họ và tên" {...register("fullName")} />
+        </FormField>
+        <FormField
+          name="email"
+          label="Email"
+          required
+          error={errors.email}
+        >
+          <Input type="email" placeholder="Nhập email" {...register("email")} />
+        </FormField>
+        <FormField
+          name="password"
+          label="Mật khẩu"
+          required
+          error={errors.password}
+        >
+          <Input type="password" placeholder="Nhập mật khẩu" {...register("password")} />
+        </FormField>
+        {error && (
+          <p className="text-sm text-destructive text-center">
+            {typeof error === "string" ? error : (error as { message: string }).message}
+          </p>
         )}
-
-        {/* Nếu có lỗi khi đăng ký */}
-        {!user && (
-          <>
-            <div className="mb-4">
-              <label className="block text-gray-700">Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-            <div className="mb-6">
-          <label className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}   
-
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-          {/* Display password error message */}
-          {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>} 
-        </div>
-
-            {error && (
-              <div className="mb-4">
-                <p className="text-red-500 text-center">
-                  {typeof error === 'string' ? error : error.message}
-                </p>
-                <button
-                  type="button"
-                  onClick={handleRetry}
-                  className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
-                >
-                  Thử lại
-                </button>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Registering...' : 'Register'}
-            </button>
-          </>
-        )}
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Đang đăng ký..." : "Đăng ký"}
+        </Button>
       </form>
-    </div>
+    </AuthTemplate>
   );
 }

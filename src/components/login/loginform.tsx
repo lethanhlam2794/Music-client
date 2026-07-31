@@ -1,68 +1,76 @@
-// src/components/login/LoginForm.tsx
 "use client";
 
-import { FormEvent, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loginUser } from '@/redux/LoginSlice';
-import { useRouter } from 'next/navigation';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { loginUser } from "@/redux/LoginSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginSchema, type LoginFormValues } from "@/features/auth/auth-validation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/shared/FormField";
+import { AuthTemplate } from "@/templates/AuthTemplate";
+import Link from "next/link";
 
-export default function Login() {
+export default function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isLoading, error } = useAppSelector((state) => state.login);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const loginSuccess = await dispatch(loginUser(formData));
-    if (loginSuccess) {
-      router.push('/'); // Chuyển hướng đến trang chủ nếu đăng nhập thành công
+  const onSubmit = async (data: LoginFormValues) => {
+    const result = await dispatch(loginUser(data));
+    if (loginUser.fulfilled.match(result)) {
+      router.push("/");
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <div className="mb-4">
-          <label className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-        </div>
-
-        {error && <p className="text-red-500 text-center"> {typeof error === 'string' ? error : error.message} </p>}
-        <button type="submit" className="w-full bg-blue-500 text-blue py-2 rounded hover:bg-blue-600" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
+    <AuthTemplate
+      title="Đăng nhập"
+      subtitle="Nhập thông tin tài khoản để tiếp tục"
+      footer={
+        <span>
+          Chưa có tài khoản?{" "}
+          <Link href="/register" className="text-primary hover:underline">
+            Đăng ký
+          </Link>
+        </span>
+      }
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          name="email"
+          label="Email"
+          required
+          error={errors.email}
+        >
+          <Input type="email" placeholder="Nhập email" {...register("email")} />
+        </FormField>
+        <FormField
+          name="password"
+          label="Mật khẩu"
+          required
+          error={errors.password}
+        >
+          <Input type="password" placeholder="Nhập mật khẩu" {...register("password")} />
+        </FormField>
+        {error && (
+          <p className="text-sm text-destructive text-center">
+            {typeof error === "string" ? error : (error as { message: string }).message}
+          </p>
+        )}
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </Button>
       </form>
-    </div>
+    </AuthTemplate>
   );
 }

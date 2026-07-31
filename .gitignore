@@ -34,3 +34,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.claude/
+.agents/
+.codex/
+.github/
+.clinerules/
+.opencode/
+
+plans/
+design-system/
+docs/
