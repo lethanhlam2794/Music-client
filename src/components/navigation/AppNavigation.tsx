@@ -4,57 +4,86 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAVIGATION_ITEMS } from "./navigation-items";
 import { UserMenu } from "./UserMenu";
+import { MobileNav } from "./MobileNav";
 import { useAuthSession } from "@/features/auth/use-auth-session";
 import { cn } from "@/lib/utils";
-import { Music } from "lucide-react";
+import { Music, Search, Disc3 } from "lucide-react";
 
 export function AppNavigation() {
   const pathname = usePathname();
   const { isLoggedIn } = useAuthSession();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        {/* Logo */}
-        <Link href="/" className="mr-6 flex items-center gap-2">
-          <Music className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">Music App</span>
-        </Link>
+    <>
+      <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10 backdrop-blur-xl">
+        <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
+          {/* Brand Logo */}
+          <Link href="/" className="mr-8 flex items-center gap-2.5 group">
+            <div className="size-9 rounded-xl bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-300">
+              <Disc3 className="h-5 w-5 text-white animate-spin-slow" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-base tracking-tight text-gradient">
+                Music Lâm
+              </span>
+              <span className="text-[10px] text-muted-foreground -mt-1 font-medium">
+                Premium Audio
+              </span>
+            </div>
+          </Link>
 
-        {/* Navigation Links */}
-        <nav className="flex items-center gap-6 text-sm">
-          {NAVIGATION_ITEMS.map((item) => {
-            // Skip auth-required items if not logged in
-            if (item.requiresAuth && !isLoggedIn) {
-              return null;
-            }
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+            {NAVIGATION_ITEMS.map((item) => {
+              if (item.requiresAuth && !isLoggedIn) return null;
 
-            const isActive = pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/" && pathname.startsWith(item.href));
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-1.5 transition-colors hover:text-foreground",
-                  isActive
-                    ? "text-foreground font-medium"
-                    : "text-foreground/60"
-                )}
-              >
-                {item.icon && <item.icon className="h-4 w-4" />}
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all duration-200",
+                    isActive
+                      ? "bg-white/10 text-white shadow-sm border border-white/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  )}
+                >
+                  {item.icon && <item.icon className="h-4 w-4" />}
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-        {/* User Menu - Right aligned */}
-        <div className="ml-auto">
-          <UserMenu />
+          {/* Quick Search Bar (Decorative / Interactive Trigger) */}
+          <div className="hidden lg:flex items-center mx-6 flex-1 max-w-sm">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm bài hát, nghệ sĩ..."
+                className="w-full h-9 pl-9 pr-12 rounded-full bg-white/5 border border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all"
+                readOnly
+              />
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-muted-foreground font-mono">
+                ⌘K
+              </kbd>
+            </div>
+          </div>
+
+          {/* User Menu - Right aligned */}
+          <div className="ml-auto">
+            <UserMenu />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Navigation bar */}
+      <MobileNav />
+    </>
   );
 }

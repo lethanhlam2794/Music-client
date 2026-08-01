@@ -14,6 +14,8 @@ import { MusicListState } from "@/components/music/MusicListState";
 import { NowPlayingBar } from "@/components/music/NowPlayingBar";
 import MusicPlayer from "@/components/music/MusicPlayer";
 import { Button } from "@/components/ui/button";
+import { Flame, Compass, Sparkles, Filter } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -23,9 +25,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
+const GENRE_TAGS = ["Tất cả", "Pop", "Ballad", "Rock", "Lofi", "EDM", "HipHop"];
+
 export function HomePageClient() {
   const router = useRouter();
   const [selectedMusic, setSelectedMusic] = useState<MusicTrack | null>(null);
+  const [activeTag, setActiveTag] = useState<string>("Tất cả");
   const { tracks, loading, error, updateTrack } = useMusicList(getRecentMusic, []);
   const { toggle, isPending, requiresLogin, dismissLoginPrompt } = useLikeToggle();
 
@@ -43,35 +48,85 @@ export function HomePageClient() {
     }
   };
 
+  const filteredTracks = activeTag === "Tất cả"
+    ? tracks
+    : tracks.filter((t) => t.tag?.toLowerCase() === activeTag.toLowerCase());
+
   return (
-    <div className="bg-background">
-      <MusicHero
-        title="Chào mừng đến với thế giới âm nhạc"
-        description="Khám phá hàng triệu bài hát, album và nghệ sĩ yêu thích của bạn."
-      >
-        <Button className="mt-4" variant="secondary" onClick={() => router.push("/tag")}>
-          Khám phá ngay
-        </Button>
-      </MusicHero>
+    <div className="min-h-screen bg-transparent pb-32">
+      <div className="container mx-auto px-4 md:px-6">
+        {/* Hero Section Banner */}
+        <MusicHero
+          title="Chào mừng đến với thế giới âm nhạc"
+          description="Khám phá hàng triệu bài hát, album và nghệ sĩ yêu thích với chất lượng âm thanh cao cấp đỉnh cao."
+        >
+          <Button
+            size="lg"
+            className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-7 font-bold text-white shadow-lg shadow-violet-600/30 hover:shadow-violet-600/50 hover:scale-105 transition-all duration-300 gap-2"
+            onClick={() => router.push("/tag")}
+          >
+            <Compass className="h-4 w-4" />
+            Khám phá thể loại
+          </Button>
+        </MusicHero>
 
-      <section className="container mx-auto py-12">
-        <h2 className="text-3xl font-bold text-foreground mb-8">Phát hành mới</h2>
-        <MusicListState loading={loading} error={error} isEmpty={!loading && tracks.length === 0}>
-          <MusicGrid>
-            {tracks.map((track) => (
-              <MusicCard
-                key={track.id}
-                track={track}
-                avatarUrl={getAvatarUrl(track.id)}
-                onSelect={handleSelect}
-                onToggleLike={handleLikeToggle}
-                isLikePending={isPending}
-              />
-            ))}
-          </MusicGrid>
-        </MusicListState>
-      </section>
+        {/* Music Section */}
+        <section className="py-8">
+          {/* Section Title & Tag Filters */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                <Flame className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                  Phát Hành Mới
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Những bản nhạc hot nhất vừa được tải lên
+                </p>
+              </div>
+            </div>
 
+            {/* Filter Chips */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+              {GENRE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(tag)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 border",
+                    activeTag === tag
+                      ? "bg-violet-600 text-white border-violet-500 shadow-md shadow-violet-500/30 font-semibold"
+                      : "bg-white/5 text-muted-foreground border-white/10 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tracks Grid */}
+          <MusicListState loading={loading} error={error} isEmpty={!loading && filteredTracks.length === 0}>
+            <MusicGrid>
+              {filteredTracks.map((track) => (
+                <MusicCard
+                  key={track.id}
+                  track={track}
+                  avatarUrl={getAvatarUrl(track.id)}
+                  onSelect={handleSelect}
+                  onToggleLike={handleLikeToggle}
+                  isLikePending={isPending}
+                  isPlaying={selectedMusic?.id === track.id}
+                />
+              ))}
+            </MusicGrid>
+          </MusicListState>
+        </section>
+      </div>
+
+      {/* Fixed Now Playing Bar */}
       {selectedMusic && (
         <NowPlayingBar>
           <MusicPlayer
@@ -89,20 +144,24 @@ export function HomePageClient() {
         </NowPlayingBar>
       )}
 
+      {/* Login Prompt Dialog */}
       <Dialog open={requiresLogin} onOpenChange={(open) => { if (!open) dismissLoginPrompt(); }}>
-        <DialogContent>
+        <DialogContent className="glass-panel border-white/10 text-foreground">
           <DialogHeader>
-            <DialogTitle>Vui lòng đăng nhập</DialogTitle>
-            <DialogDescription>
-              Bạn cần đăng nhập để thích bài hát này.
+            <DialogTitle className="text-xl font-bold text-gradient">Vui lòng đăng nhập</DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Bạn cần đăng nhập tài khoản để có thể thả tim và lưu bài hát yêu thích.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={dismissLoginPrompt}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="ghost" className="rounded-full text-xs" onClick={dismissLoginPrompt}>
               Để sau
             </Button>
-            <Button onClick={() => { dismissLoginPrompt(); router.push("/login"); }}>
-              Đăng nhập
+            <Button
+              className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-xs font-semibold text-white shadow-lg"
+              onClick={() => { dismissLoginPrompt(); router.push("/login"); }}
+            >
+              Đăng nhập ngay
             </Button>
           </DialogFooter>
         </DialogContent>
