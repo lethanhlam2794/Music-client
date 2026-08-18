@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { AppNavigation } from "@/components/navigation";
+import { DragonCursor } from "@/components/effects/DragonCursor";
+import { NCSBackground } from "@/components/effects/NCSBackground";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -31,8 +33,10 @@ export default function RootLayout({
         className={`${outfit.variable} ${inter.variable} font-sans antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground`}
       >
         <Providers>
+          <NCSBackground />
+          <DragonCursor />
           <AppNavigation />
-          <main className="min-h-screen pb-24">{children}</main>
+          <main className="min-h-screen pb-24 relative z-10">{children}</main>
         </Providers>
       </body>
     </html>

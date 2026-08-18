@@ -54,7 +54,7 @@ export function GenreDetailPageClient({ genre }: GenreDetailPageClientProps) {
   };
 
   return (
-    <div className="bg-background">
+    <div className="bg-transparent min-h-screen pb-24">
       <MusicHero
         title={`Thể loại: ${decodedGenre}`}
         description={`Khám phá các bài hát hay nhất trong thể loại ${decodedGenre}.`}

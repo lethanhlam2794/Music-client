@@ -7,7 +7,7 @@ import { UserMenu } from "./UserMenu";
 import { MobileNav } from "./MobileNav";
 import { useAuthSession } from "@/features/auth/use-auth-session";
 import { cn } from "@/lib/utils";
-import { Music, Search, Disc3 } from "lucide-react";
+import { Search, Disc3 } from "lucide-react";
 
 export function AppNavigation() {
   const pathname = usePathname();
@@ -15,11 +15,11 @@ export function AppNavigation() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/8 backdrop-blur-2xl">
         <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
           {/* Brand Logo */}
           <Link href="/" className="mr-8 flex items-center gap-2.5 group">
-            <div className="size-9 rounded-xl bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-300">
+            <div className="size-9 rounded-xl bg-gradient-to-tr from-violet-600 via-fuchsia-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 group-hover:glow-violet transition-all duration-300">
               <Disc3 className="h-5 w-5 text-white animate-spin-slow" />
             </div>
             <div className="flex flex-col">
@@ -46,10 +46,10 @@ export function AppNavigation() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all duration-200",
+                    "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 relative",
                     isActive
-                      ? "bg-white/10 text-white shadow-sm border border-white/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                      ? "bg-violet-500/15 text-white shadow-sm border border-violet-500/25 glow-violet"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/8"
                   )}
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}
@@ -59,30 +59,29 @@ export function AppNavigation() {
             })}
           </nav>
 
-          {/* Quick Search Bar (Decorative / Interactive Trigger) */}
+          {/* Search Bar */}
           <div className="hidden lg:flex items-center mx-6 flex-1 max-w-sm">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <div className="relative w-full group/search">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within/search:text-violet-400 transition-colors" />
               <input
                 type="text"
                 placeholder="Tìm kiếm bài hát, nghệ sĩ..."
-                className="w-full h-9 pl-9 pr-12 rounded-full bg-white/5 border border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all"
+                className="w-full h-9 pl-10 pr-14 rounded-full bg-white/5 border border-white/10 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/25 focus:bg-white/8 transition-all duration-300"
                 readOnly
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-muted-foreground font-mono">
+              <kbd className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-muted-foreground font-mono border border-white/10">
                 ⌘K
               </kbd>
             </div>
           </div>
 
-          {/* User Menu - Right aligned */}
+          {/* User Menu */}
           <div className="ml-auto">
             <UserMenu />
           </div>
         </div>
       </header>
 
-      {/* Mobile Navigation bar */}
       <MobileNav />
     </>
   );

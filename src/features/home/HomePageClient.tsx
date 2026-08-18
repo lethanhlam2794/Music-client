@@ -62,7 +62,7 @@ export function HomePageClient() {
         >
           <Button
             size="lg"
-            className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-7 font-bold text-white shadow-lg shadow-violet-600/30 hover:shadow-violet-600/50 hover:scale-105 transition-all duration-300 gap-2"
+            className="rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 px-8 font-bold text-white shadow-lg shadow-violet-600/40 hover:shadow-violet-600/60 hover:scale-105 transition-all duration-300 gap-2 btn-shimmer glow-violet"
             onClick={() => router.push("/tag")}
           >
             <Compass className="h-4 w-4" />
@@ -71,16 +71,16 @@ export function HomePageClient() {
         </MusicHero>
 
         {/* Music Section */}
-        <section className="py-8">
+        <section className="py-10 animate-fade-in-up animate-delay-200">
           {/* Section Title & Tag Filters */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+              <div className="size-11 rounded-2xl bg-gradient-to-tr from-violet-600 via-fuchsia-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30 glow-violet-pulse">
                 <Flame className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                  Phát Hành Mới
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+                  <span className="text-gradient">Phát Hành Mới</span>
                 </h2>
                 <p className="text-xs text-muted-foreground">
                   Những bản nhạc hot nhất vừa được tải lên
@@ -95,10 +95,10 @@ export function HomePageClient() {
                   key={tag}
                   onClick={() => setActiveTag(tag)}
                   className={cn(
-                    "px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 border",
+                    "px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 border",
                     activeTag === tag
-                      ? "bg-violet-600 text-white border-violet-500 shadow-md shadow-violet-500/30 font-semibold"
-                      : "bg-white/5 text-muted-foreground border-white/10 hover:text-white hover:bg-white/10"
+                      ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-violet-500/50 shadow-lg shadow-violet-500/30 glow-violet"
+                      : "bg-white/5 text-muted-foreground border-white/10 hover:text-white hover:bg-white/10 hover:border-white/20"
                   )}
                 >
                   {tag}
