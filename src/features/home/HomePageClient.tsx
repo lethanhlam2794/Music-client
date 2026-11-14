@@ -50,7 +50,7 @@ export function HomePageClient() {
 
   const filteredTracks = activeTag === "Tất cả"
     ? tracks
-    : tracks.filter((t) => t.tag?.toLowerCase() === activeTag.toLowerCase());
+    : tracks.filter((t) => t.genre?.toLowerCase() === activeTag.toLowerCase());
 
   return (
     <div className="min-h-screen bg-transparent pb-32">
