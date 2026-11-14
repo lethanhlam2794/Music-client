@@ -7,7 +7,7 @@ import { NCSBackground } from "@/components/effects/NCSBackground";
 import "./globals.css";
 
 const outfit = Outfit({
-  subsets: ["latin", "vietnamese"],
+  subsets: ["latin", "latin-ext"],
   variable: "--font-outfit",
   weight: ["400", "500", "600", "700", "800"],
 });
