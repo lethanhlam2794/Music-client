@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node --env-file-if-exists=.env node_modules/next/dist/bin/next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node --env-file-if-exists=.env .next/standalone/server.js",
     "lint": "eslint src/",
     "test": "vitest run",
     "test:unit": "vitest run",
